@@ -172,7 +172,7 @@ class LexicalDecoder:
     def print_val(self, span):
         print("----------------SPAN---------------")
         print(span)
-        print("----------------FEATURES---------------")
+        print("----------------LEXICAL---------------")
         t: LexicalFeatures = self.extract_lexical_features(span)
         for field in fields(LexicalFeatures):
             print(f"{field.name}: {getattr(t, field.name)}")

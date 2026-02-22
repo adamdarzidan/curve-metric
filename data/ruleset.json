@@ -1,14 +1,96 @@
 {
-    "first_person": [
-        "i",
-        "me",
-        "my",
-        "mine",
-        "myself",
-        "we",
-        "us",
-        "our",
-        "ours",
-        "ourselves"
+  "first_person": [
+    "i",
+    "me",
+    "my",
+    "mine",
+    "myself",
+    "we",
+    "us",
+    "our",
+    "ours",
+    "ourselves"
+  ],
+
+  "connectives": {
+    "causal_connectives": [
+      "because",
+      "since",
+      "as",
+      "so",
+      "therefore",
+      "thus",
+      "hence",
+      "consequently",
+      "due to",
+      "owing to",
+      "for this reason",
+      "as a result"
+    ],
+
+    "temporal_connectives": [
+      "before",
+      "after",
+      "then",
+      "when",
+      "while",
+      "as soon as",
+      "once",
+      "until",
+      "since",
+      "as",
+      "meanwhile",
+      "subsequently",
+      "eventually",
+      "at the same time",
+      "later",
+      "earlier"
+    ],
+
+    "logical_connectives": [
+      "if",
+      "then",
+      "only if",
+      "provided that",
+      "in order that",
+      "otherwise",
+      "hence",
+      "therefore",
+      "thus",
+      "so",
+      "because",
+      "as a result",
+      "consequently"
+    ],
+
+    "additive_connectives": [
+      "and",
+      "also",
+      "too",
+      "as well as",
+      "moreover",
+      "furthermore",
+      "in addition",
+      "besides",
+      "additionally",
+      "not only... but also"
+    ],
+
+    "adversative_connectives": [
+      "but",
+      "however",
+      "yet",
+      "although",
+      "though",
+      "whereas",
+      "on the other hand",
+      "nevertheless",
+      "nonetheless",
+      "despite",
+      "in contrast",
+      "instead",
+      "even though",
+      "while"
     ]
+  }
 }

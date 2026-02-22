@@ -30,7 +30,7 @@ class LexicalFeatures:
 class SurfaceFeatures:
     word_count: int = 0
     sentence_length: int = 0
-    function_to_content_ratio: float = 0.0
+    function_to_content_ratio: float = 0.0 # to be removed
 
     # connectives
     connectives_total: int = 0
