@@ -1,6 +1,6 @@
 import json  
 import sys
-from .components.metric import Metric
+from components.metric import Metric
   
 def main(file_name: str):
     try:
