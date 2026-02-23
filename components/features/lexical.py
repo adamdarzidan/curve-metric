@@ -74,6 +74,7 @@ class LexicalDecoder:
         # Manages content word frequency: i.e. the frequency of words that arent stop words
         total_content_word_freq = 0
         count_content_word = 0
+        
         syllables_count = 0
         
         t_word_concreteness = 0.0
@@ -104,18 +105,18 @@ class LexicalDecoder:
             match token.pos_:
                 case "NOUN" | "PROPN":
                     lexical_features.nouns += 1
-                    lexical_features.avg_content_word_frequency_log += word_freq
+                    total_content_word_freq += word_freq
                     count_content_word += 1
                 case "VERB":
                     lexical_features.verbs += 1
-                    lexical_features.avg_content_word_frequency_log += word_freq
+                    total_content_word_freq+= word_freq
                     count_content_word += 1
                 case "ADJ":
-                    lexical_features.avg_content_word_frequency_log += word_freq
+                    total_content_word_freq+= word_freq
                     count_content_word += 1
                     lexical_features.adjectives += 1
                 case "ADV":
-                    lexical_features.avg_content_word_frequency_log += word_freq
+                    total_content_word_freq += word_freq
                     count_content_word += 1
                     lexical_features.adverbs += 1
                 case "PRON":

@@ -7,11 +7,6 @@ import json
 
 class SurfaceDecoder:
    def __init__(self, CONNECTIVES_PATH = "data/ruleset.json"):
-      self.CASUAL_CONNECTIVES = []
-      self.TEMPORAL_CONNECTIVES = []
-      self.LOGICAL_CONNECTIVES = []
-      self.ADDITIVE_CONNECTIVES = []
-      self.ADVERSATIVE_CONNECTIVES = []
       try:
          with open(CONNECTIVES_PATH) as file:
             data = json.load(file)
@@ -37,7 +32,7 @@ class SurfaceDecoder:
          pos = token.pos_
          text = token.text.lower().strip()
          if pos  in {"CCONJ", "SCONJ"}:
-            if text in self.CASUAL_CONNECTIVES:
+            if text in self.CAUSAL_CONNECTIVES:
                surface_features.causal_connectives += 1
             if text in self.ADDITIVE_CONNECTIVES:
                surface_features.additive_connectives += 1

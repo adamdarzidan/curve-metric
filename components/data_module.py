@@ -43,7 +43,7 @@ class SurfaceFeatures:
 @dataclass
 class SyntaxFeatures:
     dependency_depth: int = 0
-    modifiers_per_np: float = 0.0
+    modifiers_per_np: float = 0.0 #
     words_before_main_verb: int = 0
     passive_constructions: int = 0
     syntactic_similarity_prev: float = 0.0  # optional for later
