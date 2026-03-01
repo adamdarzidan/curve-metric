@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import numpy as np
 
 @dataclass
 class LexicalFeatures:
@@ -39,6 +40,7 @@ class SurfaceFeatures:
     logical_connectives: int = 0
     additive_connectives: int = 0
     adversative_connectives: int = 0
+    
     
 @dataclass
 class SyntaxFeatures:
@@ -84,3 +86,15 @@ class SentenceFeatures:
     syntax: SyntaxFeatures
     lexical: LexicalFeatures
     cohesion: CohesionFeatures
+@dataclass
+class DocumentFeatures:
+    all_content_lemmas: set
+    all_noun_lemmas: set
+    all_verb_lemmas: set
+    all_stems: set
+    all_argument_lemmas: set
+    
+    sentence_embeddings: np.ndarray  # shape: (num_sentences, 384)
+    
+    lexical_diversity_all: float
+    lexical_diversity_verbs: float

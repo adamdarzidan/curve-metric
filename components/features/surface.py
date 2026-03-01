@@ -26,7 +26,7 @@ class SurfaceDecoder:
       surface_features = SurfaceFeatures()
       
       surface_features.sentence_length = len(span.text)
-      surface_features.word_count = len(span)
+      surface_features.word_count = len(span)   
       
       for token in span:
          pos = token.pos_
