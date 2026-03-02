@@ -37,7 +37,9 @@ class FeatureProfiler:
             else:
                 cohesion_feature = self.cohesion_decoder.extract_cohesion_features(index, prev_sent, sent)
                 
-            self.cohesion_decoder.print_features("Surface Features", cohesion_feature)
+            self.lexical_decoder.print_val(sent)
+            self.surface_decoder.print_val(sent)
+            self.cohesion_decoder.print_features("COHESTION", cohesion_feature)
             
             prev_sent = sent
             

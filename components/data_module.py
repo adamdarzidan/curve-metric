@@ -1,6 +1,14 @@
 from dataclasses import dataclass
 import numpy as np
 
+
+@dataclass
+class FeatureStats:
+    avg: float
+    sd: float
+    min: float | int
+    max: float | int
+
 @dataclass
 class LexicalFeatures:
     # POS counts
@@ -98,3 +106,68 @@ class DocumentFeatures:
     
     lexical_diversity_all: float
     lexical_diversity_verbs: float
+    
+    
+@dataclass
+class DocumentProfile:
+    # Lexical features
+    nouns: FeatureStats
+    verbs: FeatureStats
+    adjectives: FeatureStats
+    adverbs: FeatureStats
+    pronouns: FeatureStats
+    first_person_pronouns: FeatureStats
+    third_person_pronouns: FeatureStats
+
+    avg_syllables_per_word: FeatureStats
+    avg_word_frequency_log: FeatureStats
+    avg_content_word_frequency_log: FeatureStats
+    avg_age_of_acquisition: FeatureStats
+    avg_concreteness: FeatureStats
+    avg_imagery: FeatureStats
+    avg_familiarity: FeatureStats
+    avg_polysemy: FeatureStats
+    
+    word_count: FeatureStats
+    sentence_length: FeatureStats
+    function_to_content_ratio: FeatureStats
+
+    # connectives
+    connectives_total: FeatureStats
+    causal_connectives: FeatureStats
+    temporal_connectives: FeatureStats
+    logical_connectives: FeatureStats
+    additive_connectives: FeatureStats
+    adversative_connectives: FeatureStats
+    
+    dependency_depth: FeatureStats
+    modifiers_per_np: FeatureStats
+    words_before_main_verb: FeatureStats
+    passive_constructions: FeatureStats
+    syntactic_similarity_prev: None # Not currently being used
+    
+    content_overlap_adjacent: FeatureStats
+    content_overlap_all: FeatureStats
+    noun_overlap_adjacent: FeatureStats
+    argument_overlap_adjacent: FeatureStats
+    stem_overlap_all: FeatureStats
+
+    lsa_overlap_adjacent: FeatureStats
+    lsa_overlap_all: FeatureStats
+    lsa_given_new: FeatureStats
+    lsa_verb_overlap_adjacent: FeatureStats
+
+    pos_dissimilarity_prev: FeatureStats
+    word_dissimilarity_prev: FeatureStats
+
+    causal_cohesion: FeatureStats
+    intentional_cohesion: FeatureStats
+    temporal_cohesion: FeatureStats
+
+    verb_overlap_adjacent: FeatureStats
+    verb_tense_repetition: FeatureStats
+    verb_aspect_repetition: FeatureStats
+
+    type_token_ratio: FeatureStats
+    lexical_diversity_all: FeatureStats
+    lexical_diversity_verbs: FeatureStats
