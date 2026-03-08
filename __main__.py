@@ -3,6 +3,11 @@ import sys
 import os
 from components.metric import Metric
 
+from termcolor import colored
+from colorama import init
+
+init()
+
 TRAIN_FILE_PATH = "data/train/"
 LOAD_FILE_PATH = "weights/"
 TEST_FILE_PATH = "data/texts/"
@@ -13,6 +18,9 @@ TEST_FILENAMES = [f.lower() for f in os.listdir(TEST_FILE_PATH)]
 
 
 VALID_COMMANDS = ["train", "quit", "load", "test", "back"]
+
+BOLD = '\033[1m'
+END = '\033[0m'
 
 def format_title(title: str | None, total_length: int = 60) -> str:
     if title is None:
@@ -42,9 +50,11 @@ def train_command(model: Metric) -> bool:
             except:
                 return False
             
-        num_texts = input("Enter max number of training sets you want to train for. Enter none for all")
-        if(num_texts == "" or type(num_texts) is not int):
+        try:
+            num_texts = int(input("Enter max number of training sets you want to train for. Enter none for all: "))
+        except:
             num_texts = -1
+        
         model.train(TRAIN_FILE_PATH + TRAIN_FILENAMES[idx - 1], num_texts if num_texts != -1 else 500)
         return False
         
@@ -93,27 +103,30 @@ def test_command(model: Metric) -> bool:
         with open(TEST_FILE_PATH + TEST_FILENAMES[idx - 1]) as f:
             text = f.read()
             
-        print(format_title(None))
+        print("\n\n\n", format_title(None))
         print("Text: ", text)
-        print(f"\n{format_title(None)}\nText score: {model.score(text)}\n{format_title(None)}")
+        print(f"\n{format_title(None)}\n{BOLD}Text score:{END} {colored(model.score(text), "red")}\n{format_title(None)}\n\n")
         return False
         
   
 def main():
+    print("Loading Model Object...")
     model = Metric([0])
+    print("\n\nModel object loaded!\n")
     quit = False
     while(not quit):
         print("\n", format_title("METRIC SYSTEM"))
         print("CMDS:")
-        print("QUIT - Quit Program")
-        print("TRAIN - Train the model | params: csv_file")
-        print("TEST - Test a model | params: text, model_file")
-        print("LOAD - Load a pre-existing model | params: file_path")
+        print(colored("QUIT", "red"), " - Quit Program")
+        print(colored("TRAIN", "green"), " - Train the model | params: csv_file")
+        print(colored("TEST", "blue") ," - Test a model | params: text, model_file")
+        print(colored("LOAD", "yellow")," - Load a pre-existing model | params: file_path")
         print(format_title(None))
         cmd = input()
         while(not valid_command(cmd)):
-            cmd = input(f"Enter a valid command: {VALID_COMMANDS}")
+            cmd = input(f"Enter a valid command: {VALID_COMMANDS}\n")
             
+        print("\n\n")
         match cmd.lower():
             case "quit":
                 quit = True

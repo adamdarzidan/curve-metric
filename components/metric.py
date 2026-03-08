@@ -174,7 +174,7 @@ class Metric:
         self.model = model
         self.loaded = True
         
-    def train(self, csv_path, save=True, samples=500):
+    def train(self, csv_path, samples=500):
         print("\nTRAINING PROCESS STARTING: ")
         csv_data: CSVData = self.__prepare_train_csv(csv_path, samples)
         pre_lin_data: PreLinearRegData = self.__formated_data_pre_lin_reg(csv_data)
