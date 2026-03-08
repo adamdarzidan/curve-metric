@@ -3,8 +3,6 @@ from spacy.tokens import Token
 from ..data_module import SyntaxFeatures
 
 class SyntaxDecoder:
-    def __init__(self):
-        print("fill")
         
     def get_dependency_graph(self, token, depth):
         if token.n_lefts + token.n_rights == 0:

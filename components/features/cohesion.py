@@ -59,12 +59,10 @@ class CohesionDecoder:
         verbs_prev = [t.lemma_ for t in prev_sent if t.pos_ == "VERB"]
         verbs_curr = [t.lemma_ for t in sent if t.pos_ == "VERB"]
         if verbs_prev and verbs_curr:
-            # simple approach: embed verbs as short pseudo-sentences
-            from sentence_transformers import SentenceTransformer
-            model = SentenceTransformer("all-MiniLM-L12-v2")  # or pass model externally
-            embed_verbs_prev = model.encode([" ".join(verbs_prev)]).reshape(1, -1)
-            embed_verbs_curr = model.encode([" ".join(verbs_curr)]).reshape(1, -1)
-            cohesion_features.lsa_verb_overlap_adjacent = float(cosine_similarity(embed_verbs_curr, embed_verbs_prev)[0][0])
+            # approximate verb semantic overlap using sentence embeddings already computed
+            cohesion_features.lsa_verb_overlap_adjacent = float(
+                cosine_similarity(embedding_sent, embedding_prev_sent)[0][0]
+            )
 
         # POS and lexical dissimilarity
         pos_prev = [t.pos_ for t in prev_sent]

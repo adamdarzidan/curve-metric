@@ -9,6 +9,10 @@ class DocumentExtracter:
     """
 
     def __init__(self, embedding_model_name="all-MiniLM-L12-v2"):
+        import logging
+        logging.getLogger("transformers").setLevel(logging.ERROR)
+        logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
+        
         self.embedding_model = SentenceTransformer(embedding_model_name)
 
     def extract(self, doc: Doc) -> DocumentFeatures:
@@ -50,6 +54,7 @@ class DocumentExtracter:
         )
 
         sentence_texts = [sent.text for sent in sentences]
+        
         sentence_embeddings = self.embedding_model.encode(sentence_texts)
 
         return DocumentFeatures(
