@@ -8,7 +8,7 @@ from dataclasses import dataclass, fields
 
 import polars as pl
 import json
-import util
+from util import avg
 
 from huggingface_hub import login
 from config import HF_TOKEN
@@ -157,14 +157,14 @@ class LexicalDecoder:
             
         # Final calculations to return        
         
-        lexical_features.avg_syllables_per_word = util.avg(syllables_count, span_len)
-        lexical_features.avg_word_frequency_log = util.avg(total_word_freq, span_len)
-        lexical_features.avg_content_word_frequency_log = util.avg(total_content_word_freq, span_len)
+        lexical_features.avg_syllables_per_word = avg(syllables_count, span_len)
+        lexical_features.avg_word_frequency_log = avg(total_word_freq, span_len)
+        lexical_features.avg_content_word_frequency_log = avg(total_content_word_freq, span_len)
         
-        lexical_features.avg_concreteness = util.avg(t_word_concreteness, t_word_concreteness_defined)
-        lexical_features.avg_age_of_acquisition = util.avg(t_aoa, t_aoa_defined)
-        lexical_features.avg_imagery = util.avg(t_imagery, t_imagery_defined)
-        lexical_features.avg_familiarity = util.avg(t_familiarity, t_familiarity_defined)
+        lexical_features.avg_concreteness = avg(t_word_concreteness, t_word_concreteness_defined)
+        lexical_features.avg_age_of_acquisition = avg(t_aoa, t_aoa_defined)
+        lexical_features.avg_imagery = avg(t_imagery, t_imagery_defined)
+        lexical_features.avg_familiarity = avg(t_familiarity, t_familiarity_defined)
         
                 
         return lexical_features

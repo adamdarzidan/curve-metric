@@ -171,3 +171,26 @@ class DocumentProfile:
     type_token_ratio: FeatureStats
     lexical_diversity_all: FeatureStats
     lexical_diversity_verbs: FeatureStats
+    
+
+@dataclass
+class ScoreStruct:    
+    custom: int
+    flesh_kincaid_ease: int
+    flesh_kincaid_level: int
+    smog_analysis: int
+    gunning_fog: int
+    
+
+@dataclass
+class HospitalStruct:
+    name: str
+    state: str
+    type: str
+    rank: int
+    
+    pdf_link: str
+    text: list[str]
+    
+    scores: ScoreStruct
+    

@@ -7,12 +7,13 @@ from .data_module import SentenceFeatures, DocumentProfile
 from dataclasses import fields
 from typing import List, Dict, Optional
 import numpy as np
+import xgboost
+import shap
 
 import json
 import csv
 import dataclasses
 
-from sklearn.linear_model import LinearRegression
 
 DocumentFeatures = list[float]
 CSVData = List[Dict[str, Optional[float]]]
@@ -20,7 +21,6 @@ PreLinearRegData = list[list, float]
 
 OUTPUT_DIR_WEIGHT = "weights/"
 os.makedirs(OUTPUT_DIR_WEIGHT, exist_ok=True)
-
 
 OUTPUT_FILENAMES = [f.lower() for f in os.listdir(OUTPUT_DIR_WEIGHT)]
 
@@ -31,6 +31,7 @@ class Metric:
         lp = LinguisticProcessor()
         self.fp = FeatureProfiler(lp)
         self.loaded: bool = False
+        self.model_filepath = ""
         
     def __extract_doc_features(self, text, return_type=None) -> DocumentFeatures:
 
@@ -167,12 +168,12 @@ class Metric:
         except FileNotFoundError:
            print(f"weight_path entered does not exist: {weight_path}")
 
-        model = LinearRegression()
-        model.coef_ = np.array(weights_dict["coefficients"])
-        model.intercept_ = float(weights_dict["intercept"])
+        model = xgboost.XGBRegressor()
+        model.load_model(weight_path)
         
         self.model = model
         self.loaded = True
+        self.model_filepath = weight_path
         
     def train(self, csv_path, samples=500):
         print("\nTRAINING PROCESS STARTING: ")
@@ -185,14 +186,10 @@ class Metric:
         X = list(X)
         y = list(y)
 
-        model = LinearRegression()
-        model.fit(X, y)
-        print("model created succesfully....\n")
-
-        weights_dict = {
-            "intercept": float(model.intercept_),
-            "coefficients": model.coef_.tolist()
-        }
+        model = xgboost.XGBRegressor().fit(X, y)
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer(X)
+        
         
         file_name = input("\n\nEnter file name for weights: ")
         while(file_name == "" or file_name in OUTPUT_FILENAMES):
@@ -201,10 +198,11 @@ class Metric:
             else:
                 file_name = input("Enter a valid filename")
                         
+        self.model_filepath = file_name
+        
         file_name = os.path.join(OUTPUT_DIR_WEIGHT, file_name) + ".json"
         
-        with open(file_name, "w", encoding="utf-8",) as f:
-            json.dump(weights_dict, f, ensure_ascii=False, indent=2)
+        model.save_model(file_name)
 
         # Saves model
         self.model = model
@@ -217,4 +215,16 @@ class Metric:
         text_features = self.__extract_doc_features(text)
         predicted = self.model.predict([text_features])  # sklearn expects 2D array
         return predicted[0]
+    
         
+    def get_sentence_scores(self, document: str ):
+        sentences = document.split(".")
+        results = []
+        
+        for span in sentences:
+            score = self.score(span)
+            results.append({"sentence": span, "score": score})
+            
+        return results
+    
+    

@@ -1,0 +1,7 @@
+{
+  "hospitals": [
+    {"name": "UCLA Health", "state": "CA", "type": "Academic", "rank": 1},
+    {"name": "Mayo Clinic", "state": "MN", "type": "Academic", "rank": 2},
+    {"name": "Cedars-Sinai", "state": "CA", "type": "Private",  "rank": 3}
+  ]
+}
