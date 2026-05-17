@@ -1,7 +1,6 @@
 from ..data_module import SurfaceFeatures
 from spacy.tokens.span import Span
-from spacy.matcher import PhraseMatcher
-from dataclasses import dataclass, fields
+from dataclasses import fields
 
 import json
 
@@ -22,13 +21,17 @@ class SurfaceDecoder:
          print(f"File not found: path {CONNECTIVES_PATH} does not exist")
       
    def extract_surface_features(self, span: Span) -> SurfaceFeatures:
-      matcher = span.vocab
       surface_features = SurfaceFeatures()
+      tokens = [token for token in span if not token.is_space and not token.is_punct]
+      content_pos = {"NOUN", "PROPN", "VERB", "ADJ", "ADV"}
       
-      surface_features.sentence_length = len(span.text)
-      surface_features.word_count = len(span)   
+      surface_features.word_count = len(tokens)
+      surface_features.sentence_length = len(tokens)
+      content_word_count = sum(1 for token in tokens if token.pos_ in content_pos)
+      function_word_count = len(tokens) - content_word_count
+      surface_features.function_to_content_ratio = function_word_count / max(content_word_count, 1)
       
-      for token in span:
+      for token in tokens:
          pos = token.pos_
          text = token.text.lower().strip()
          if pos  in {"CCONJ", "SCONJ"}:
@@ -42,6 +45,14 @@ class SurfaceDecoder:
                surface_features.logical_connectives += 1
             if text in self.TEMPORAL_CONNECTIVES:
                surface_features.temporal_connectives += 1   
+
+      surface_features.connectives_total = (
+         surface_features.causal_connectives
+         + surface_features.temporal_connectives
+         + surface_features.logical_connectives
+         + surface_features.additive_connectives
+         + surface_features.adversative_connectives
+      )
             
       return surface_features
    

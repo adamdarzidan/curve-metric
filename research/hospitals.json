@@ -1,7 +1,181 @@
 {
-  "hospitals": [
-    {"name": "UCLA Health", "state": "CA", "type": "Academic", "rank": 1},
-    {"name": "Mayo Clinic", "state": "MN", "type": "Academic", "rank": 2},
-    {"name": "Cedars-Sinai", "state": "CA", "type": "Private",  "rank": 3}
-  ]
+    "hospitals": [
+        {
+            "name": "UCLA Health",
+            "directory": "ucla-health/",
+            "state": "CA",
+            "type": "Academic",
+            "rank": 1,
+            "documents": [
+                {
+                    "title": "privacy-ucla-health",
+                    "url": "https://www.uclahealth.org/sites/default/files/documents/ad/ucla-health-notice-privacy-practices-2026.pdf?f=e61a0ad6",
+                    "type": "privacy"
+                },
+                {
+                    "title": "patient-rights-ucla-health",
+                    "url": "https://www.uclahealth.org/sites/default/files/documents/Patient_Rights_and_Responsibilities.pdf",
+                    "type": "patient-rights"
+                },
+                {
+                    "title": "consent-authorization-ucla-health",
+                    "url": "https://www.uclahealth.org/sites/default/files/documents/3a/wh0397-authreleasephi.pdf?f=7f69bc36",
+                    "type": "consent-authorization"
+                },
+                {
+                    "title": "privacy-old-ucla-health",
+                    "url": "https://www.uclahealth.org/sites/default/files/documents/notice-of-privacy-practices-english.pdf",
+                    "type": "privacy-old"
+                },
+                {
+                    "title": "terms-and-conditions-ucla-health",
+                    "url": "https://www.uclahealth.org/sites/default/files/documents/COA_English.pdf",
+                    "type": "terms-and-conditions"
+                }
+            ]
+        },
+        {
+            "name": "Mayo Clinic",
+            "directory": "mayo-clinic",
+            "state": "MN",
+            "type": "Academic",
+            "rank": 2,
+            "documents": [
+                {
+                    "title": "privacy-mayo-clinic",
+                    "url": "https://www.mayoclinic.org/documents/mcsprivacy-pdf/doc-20079521",
+                    "type": "privacy"
+                }
+            ]
+        },
+        {
+            "name": "Cedars-Sinai",
+            "directory": "cedars-sinai/",
+            "state": "CA",
+            "type": "Private",
+            "rank": 3,
+            "documents": [
+                {
+                    "title": "financial-assistance-application-cedars-sinai",
+                    "url": "https://www.cedars-sinai.org/content/dam/cedars-sinai/billing-insurance/financial-assistance/documents/faps/fap-application-english.pdf",
+                    "type": "financial-assistance-application"
+                },
+                {
+                    "title": "financial-assistance-summary-cedars-sinai",
+                    "url": "https://www.cedars-sinai.org/content/dam/cedars-sinai/billing-insurance/financial-assistance/documents/plain-language-summary-english-audio.pdf",
+                    "type": "financial-assistance-summary"
+                },
+                {
+                    "title": "financial-assistance-guidelines-cedars-sinai",
+                    "url": "https://www.cedars-sinai.org/content/dam/cedars-sinai/billing-insurance/financial-assistance/documents/fpl-percentage.pdf",
+                    "type": "financial-assistance-guidelines"
+                },
+                {
+                    "title": "financial-assistance-policy-list-cedars-sinai",
+                    "url": "https://www.cedars-sinai.org/content/dam/cedars-sinai/billing-insurance/financial-assistance/documents/faps/fap-user-report.pdf",
+                    "type": "financial-assistance-policy-list"
+                }
+            ]
+        },
+        {
+            "name": "Johns Hopkins Medicine",
+            "directory": "johns-hopkins/",
+            "state": "MD",
+            "type": "Academic",
+            "rank": 4,
+            "documents": [
+                {
+                    "title": "privacy-johns-hopkins",
+                    "url": "https://www.hopkinsmedicine.org/-/media/privacy/notice-of-privacy-practices-providers.pdf",
+                    "type": "privacy"
+                },
+                {
+                    "title": "patient-rights-johns-hopkins",
+                    "url": "https://www.hopkinsmedicine.org/-/media/patient-care/documents/patient_rights/jhcp-jhrp-som.pdf",
+                    "type": "patient-rights"
+                }
+            ]
+        },
+        {
+            "name": "Cleveland Clinic",
+            "directory": "cleveland-clinic/",
+            "state": "OH",
+            "type": "Academic",
+            "rank": 5,
+            "documents": [
+                {
+                    "title": "privacy-cleveland-clinic",
+                    "url": "https://my.clevelandclinic.org/-/scassets/files/org/about/privacy-practices/cleveland-clinic-notice-of-privacy-practices-english.pdf?la=en",
+                    "type": "privacy"
+                },
+                {
+                    "title": "patient-rights-cleveland-clinic",
+                    "url": "https://my.clevelandclinic.org/-/scassets/files/org/about/patient-rights-responsibilities/patient-rights-and-responsibilities-english.pdf?la=en",
+                    "type": "patient-rights"
+                },
+                {
+                    "title": "consent-authorization-cleveland-clinic",
+                    "url": "https://my.clevelandclinic.org/-/scassets/files/org/florida/patients/release-of-information-form.pdf",
+                    "type": "consent-authorization"
+                }
+            ]
+        },
+        {
+            "name": "NYU Langone Health",
+            "directory": "nyu-langone/",
+            "state": "NY",
+            "type": "Academic",
+            "rank": 6,
+            "documents": [
+                {
+                    "title": "privacy-nyu-langone",
+                    "url": "https://nyulangone.org/files/notice-of-privacy-practices.pdf",
+                    "type": "privacy"
+                },
+                {
+                    "title": "patient-rights-nyu-langone",
+                    "url": "https://nyulangone.org/files/Patient-Rights-Responsibilities.pdf",
+                    "type": "patient-rights"
+                },
+                {
+                    "title": "consent-authorization-nyu-langone",
+                    "url": "https://nyulangone.org/files/authorization-for-the-use-and-disclosure-of-phi-june-2018.pdf",
+                    "type": "consent-authorization"
+                }
+            ]
+        },
+        {
+            "name": "Mass General Brigham",
+            "directory": "mass-general-brigham/",
+            "state": "MA",
+            "type": "Academic",
+            "rank": 7,
+            "documents": [
+                {
+                    "title": "consent-authorization-mass-general",
+                    "url": "https://www.partners.org/Assets/Documents/For-Patients/Medical-Records/Medical-Records-Release-MGH-English.pdf",
+                    "type": "consent-authorization"
+                }
+            ]
+        },
+        {
+            "name": "UCSF Health",
+            "directory": "ucsf-health/",
+            "state": "CA",
+            "type": "Academic",
+            "rank": 8,
+            "documents": [
+                {
+                    "title": "financial-assistance-application-ucsf",
+                    "url": "https://www.ucsfhealth.org/-/media/project/ucsf/ucsf-health/pdf/financial-pdfs/financial-assistance-application-english-2025.pdf?rev=9de6109ceac54a8bac6a8fbfb7c263c2",
+                    "type": "financial-assistance-application"
+                },
+                {
+                    "title": "financial-assistance-policy-ucsf",
+                    "url": "https://www.ucsfhealth.org/-/media/project/ucsf/ucsf-health/pdf/patient-financial-assistance-policy-full-version.pdf",
+                    "type": "financial-assistance-policy"
+                }
+            ]
+        }
+    ]
 }

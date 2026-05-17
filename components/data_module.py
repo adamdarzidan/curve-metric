@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import numpy as np
 
 
@@ -56,7 +56,6 @@ class SyntaxFeatures:
     modifiers_per_np: float = 0.0 #
     words_before_main_verb: int = 0
     passive_constructions: int = 0
-    syntactic_similarity_prev: float = 0.0  # optional for later
     
 @dataclass
 class CohesionFeatures:
@@ -66,26 +65,68 @@ class CohesionFeatures:
     argument_overlap_adjacent: float = 0.0
     stem_overlap_all: float = 0.0
 
+    # -----------------------------
+    # Embedding-based cohesion (ENHANCED)
+    # -----------------------------
     lsa_overlap_adjacent: float = 0.0
     lsa_overlap_all: float = 0.0
     lsa_given_new: float = 0.0
+
+    # NEW: distributional embedding features
+    lsa_overlap_mean: float = 0.0
+    lsa_overlap_std: float = 0.0
+    lsa_overlap_max: float = 0.0
+    lsa_overlap_min: float = 0.0
+
+    # NEW: semantic structure
+    lsa_novelty: float = 0.0
+    lsa_shift: float = 0.0
+
     lsa_verb_overlap_adjacent: float = 0.0
 
-    pos_dissimilarity_prev: float = 0.0
-    word_dissimilarity_prev: float = 0.0
+    # -----------------------------
+    # Embedding norm features (NEW)
+    # -----------------------------
+    embedding_norm: float = 0.0
+    embedding_norm_diff: float = 0.0
 
+    # -----------------------------
+    # Structural / syntactic
+    # -----------------------------
+    pos_dissimilarity_prev: float = 0.0
+
+    # -----------------------------
+    # Lexical change (IMPROVED)
+    # -----------------------------
+    word_dissimilarity_prev: float = 0.0
+    new_word_ratio: float = 0.0  # NEW
+
+    # -----------------------------
+    # Discourse (you already had)
+    # -----------------------------
     causal_cohesion: float = 0.0
     intentional_cohesion: float = 0.0
     temporal_cohesion: float = 0.0
 
+    # -----------------------------
+    # Verb structure
+    # -----------------------------
     verb_overlap_adjacent: float = 0.0
     verb_tense_repetition: float = 0.0
     verb_aspect_repetition: float = 0.0
 
+    # -----------------------------
+    # Diversity
+    # -----------------------------
     type_token_ratio: float = 0.0
     lexical_diversity_all: float = 0.0
     lexical_diversity_verbs: float = 0.0
-    
+
+    # -----------------------------
+    # Length / scaling (NEW)
+    # -----------------------------
+    sentence_length: float = 0.0
+    sentence_length_log: float = 0.0
 @dataclass
 class SentenceFeatures:
     sentence_id: int
@@ -94,18 +135,21 @@ class SentenceFeatures:
     syntax: SyntaxFeatures
     lexical: LexicalFeatures
     cohesion: CohesionFeatures
+
 @dataclass
 class DocumentFeatures:
-    all_content_lemmas: set
-    all_noun_lemmas: set
-    all_verb_lemmas: set
-    all_stems: set
-    all_argument_lemmas: set
-    
-    sentence_embeddings: np.ndarray  # shape: (num_sentences, 384)
-    
-    lexical_diversity_all: float
-    lexical_diversity_verbs: float
+    all_content_lemmas: set = field(default_factory=set)
+    all_noun_lemmas: set = field(default_factory=set)
+    all_verb_lemmas: set = field(default_factory=set)
+    all_stems: set = field(default_factory=set)
+    all_argument_lemmas: set = field(default_factory=set)
+
+    sentence_embeddings: np.ndarray = None 
+
+    lexical_diversity_all: float = 0.0
+    lexical_diversity_verbs: float = 0.0
+
+    sentence_cache: list[dict] = field(default_factory=list)
     
     
 @dataclass
@@ -127,6 +171,9 @@ class DocumentProfile:
     avg_imagery: FeatureStats
     avg_familiarity: FeatureStats
     avg_polysemy: FeatureStats
+    negations: FeatureStats
+    causal_verbs: FeatureStats
+    intentional_actions: FeatureStats
     
     word_count: FeatureStats
     sentence_length: FeatureStats
@@ -144,7 +191,6 @@ class DocumentProfile:
     modifiers_per_np: FeatureStats
     words_before_main_verb: FeatureStats
     passive_constructions: FeatureStats
-    syntactic_similarity_prev: None # Not currently being used
     
     content_overlap_adjacent: FeatureStats
     content_overlap_all: FeatureStats
@@ -155,42 +201,26 @@ class DocumentProfile:
     lsa_overlap_adjacent: FeatureStats
     lsa_overlap_all: FeatureStats
     lsa_given_new: FeatureStats
-    lsa_verb_overlap_adjacent: FeatureStats
+    lsa_overlap_mean: FeatureStats
+    lsa_overlap_std: FeatureStats
+    lsa_overlap_max: FeatureStats
+    lsa_overlap_min: FeatureStats
+    lsa_novelty: FeatureStats
+    lsa_shift: FeatureStats
 
     pos_dissimilarity_prev: FeatureStats
     word_dissimilarity_prev: FeatureStats
-
-    causal_cohesion: FeatureStats
-    intentional_cohesion: FeatureStats
-    temporal_cohesion: FeatureStats
+    new_word_ratio: FeatureStats
 
     verb_overlap_adjacent: FeatureStats
-    verb_tense_repetition: FeatureStats
-    verb_aspect_repetition: FeatureStats
+    embedding_norm: FeatureStats
+    embedding_norm_diff: FeatureStats
+
+    # verb_tense_repetition: FeatureStats
+    # verb_aspect_repetition: FeatureStats
 
     type_token_ratio: FeatureStats
     lexical_diversity_all: FeatureStats
     lexical_diversity_verbs: FeatureStats
-    
-
-@dataclass
-class ScoreStruct:    
-    custom: int
-    flesh_kincaid_ease: int
-    flesh_kincaid_level: int
-    smog_analysis: int
-    gunning_fog: int
-    
-
-@dataclass
-class HospitalStruct:
-    name: str
-    state: str
-    type: str
-    rank: int
-    
-    pdf_link: str
-    text: list[str]
-    
-    scores: ScoreStruct
-    
+    sentence_length_cohesion: FeatureStats
+    sentence_length_log: FeatureStats

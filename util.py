@@ -56,6 +56,7 @@ def print_ui(model: "Metric" ):
     print(colored("TRAIN", "green"), " - Train the model | params: csv_file")
     print(colored("TEST", "blue") ," - Test a model | params: text, model_file")
     print(colored("LOAD", "yellow")," - Load a pre-existing model | params: file_path")
+    print(colored("VALIDATE", "cyan")," - Validate a model | params: file_path")
     print(format_title(None))
     
 

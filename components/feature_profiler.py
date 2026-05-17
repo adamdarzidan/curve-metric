@@ -1,88 +1,111 @@
-
-from .linguistic_processor import LinguisticProcessor
-from .data_module import *
-import spacy
-from spacy.tokens import Doc, Span
-
-
-from .features.surface import SurfaceDecoder
-from .features.syntax import SyntaxDecoder
-from .features.lexical import LexicalDecoder
-from .features.cohesion import CohesionDecoder
-from .features.document import DocumentExtracter
-from .data_module import DocumentProfile
-
-class FeatureProfiler:
-    
-    def __init__(self, lp: LinguisticProcessor):
-        self.lp = lp
-        self.document_level_features = DocumentExtracter()
-        self.lexical_decoder = LexicalDecoder()
-        self.surface_decoder = SurfaceDecoder()
-        self.syntax_decoder = SyntaxDecoder()
-        self.cohesion_decoder = []
-    
 from dataclasses import fields
 import numpy as np
 from .linguistic_processor import LinguisticProcessor
-from .data_module import *
-import spacy
-from spacy.tokens import Doc, Span
+from .data_module import DocumentProfile, FeatureStats, SentenceFeatures, CohesionFeatures
+from spacy.tokens import Doc
 
 from .features.surface import SurfaceDecoder
 from .features.syntax import SyntaxDecoder
 from .features.lexical import LexicalDecoder
 from .features.cohesion import CohesionDecoder
 from .features.document import DocumentExtracter
-from .data_module import DocumentProfile, FeatureStats, SentenceFeatures, SurfaceFeatures, LexicalFeatures, SyntaxFeatures, CohesionFeatures
+
+from concurrent.futures import ThreadPoolExecutor
 
 
 class FeatureProfiler:
-    
+
     def __init__(self, lp: LinguisticProcessor):
         self.lp = lp
-        self.document_level_features = DocumentExtracter()
+        self.document_extractor = DocumentExtracter()
+
         self.lexical_decoder = LexicalDecoder()
         self.surface_decoder = SurfaceDecoder()
         self.syntax_decoder = SyntaxDecoder()
-        self.cohesion_decoder = []
 
     def extract(self, text) -> DocumentProfile:
-        doc: Doc = self.lp.process(text) if hasattr(self.lp, 'process') else self.lp(text)
-        sentence_features: list[SentenceFeatures] = []
-        self.cohesion_decoder = CohesionDecoder(self.document_level_features.extract(doc))
-        prev_sent: Span | None = None
 
-        for index, sent in enumerate(doc.sents):
-            surface_feat = self.surface_decoder.extract_surface_features(sent)
-            lexical_feat = self.lexical_decoder.extract_lexical_features(sent)
-            syntax_feat = self.syntax_decoder.extract_syntax_features(sent)
-            if prev_sent is None:
-                cohesion_feat = CohesionFeatures()
-            else:
-                cohesion_feat = self.cohesion_decoder.extract_cohesion_features(index, prev_sent, sent)
-            prev_sent = sent
-            sentence_features.append(SentenceFeatures(index, sent.text, surface_feat, syntax_feat, lexical_feat, cohesion_feat))
+        doc: Doc = self.lp.process(text) if hasattr(self.lp, "process") else self.lp(text)
+        sentences = list(doc.sents)
+
+        doc_features = self.document_extractor.extract(doc)
+        cohesion_decoder = CohesionDecoder(doc_features)
+
+        # local bindings for speed
+        surface_fn = self.surface_decoder.extract_surface_features
+        lexical_fn = self.lexical_decoder.extract_lexical_features
+        syntax_fn = self.syntax_decoder.extract_syntax_features
+
+        n = len(sentences)
+        
+        sentence_features = [None] * n
+
+        for idx, sent in enumerate(sentences):
+            surface = surface_fn(sent)
+            syntax = syntax_fn(sent)
+            lexical = lexical_fn(sent)
+            cache_entry = doc_features.sentence_cache[idx]
+            cache_entry["token_count"] = surface.word_count
+            cache_entry["causal_connectives"] = surface.causal_connectives
+            cache_entry["temporal_connectives"] = surface.temporal_connectives
+            cache_entry["logical_connectives"] = surface.logical_connectives
+            cache_entry["additive_connectives"] = surface.additive_connectives
+            cache_entry["adversative_connectives"] = surface.adversative_connectives
+            cache_entry["causal_verbs"] = lexical.causal_verbs
+            cache_entry["intentional_actions"] = lexical.intentional_actions
+            verb_tenses = set()
+            verb_aspects = set()
+            for token in sent:
+                if token.pos_ == "VERB":
+                    tense = token.morph.get("Tense")
+                    aspect = token.morph.get("Aspect")
+                    if tense:
+                        verb_tenses.update(tense)
+                    if aspect:
+                        verb_aspects.update(aspect)
+            cache_entry["verb_tenses"] = verb_tenses
+            cache_entry["verb_aspects"] = verb_aspects
+            sentence_features[idx] = SentenceFeatures(idx, sent.text, surface, syntax, lexical, cohesion_decoder.extract_cohesion_features(idx))
+        
+
 
         def make_stats(values):
-            values = np.array(values) if values else np.array([0])
+
+            if values is None or len(values) == 0:
+                return FeatureStats(0.0, 0.0, 0.0, 0.0)
+
+            arr = np.asarray(values, dtype=np.float32)
+
+            if arr.size == 0:
+                return FeatureStats(0.0, 0.0, 0.0, 0.0)
+
             return FeatureStats(
-                avg=float(np.mean(values)),
-                sd=float(np.std(values)),
-                min=float(np.min(values)),
-                max=float(np.max(values))
+                avg=float(arr.mean()),
+                sd=float(arr.std()),
+                min=float(arr.min()),
+                max=float(arr.max()),
             )
 
-        def aggregate(feature_name, cls_type):
+        def collect_values(feature_name, attr):
             values = []
             for sf in sentence_features:
-                feature_obj = getattr(sf, cls_type)
-                val = getattr(feature_obj, feature_name, 0)
-                values.append(val)
-            return make_stats(values)
+                if sf is None:
+                    values.append(0)
+                    continue
 
-        # Build the DocumentProfile
-        doc_profile = DocumentProfile(
+                obj = getattr(sf, attr, None)
+                if obj is None:
+                    values.append(0)
+                    continue
+
+                values.append(getattr(obj, feature_name, 0))
+
+            return values
+
+        def aggregate(feature_name, attr):
+            return make_stats(collect_values(feature_name, attr))
+
+        return DocumentProfile(
             nouns=aggregate("nouns", "lexical"),
             verbs=aggregate("verbs", "lexical"),
             adjectives=aggregate("adjectives", "lexical"),
@@ -98,6 +121,10 @@ class FeatureProfiler:
             avg_imagery=aggregate("avg_imagery", "lexical"),
             avg_familiarity=aggregate("avg_familiarity", "lexical"),
             avg_polysemy=aggregate("avg_polysemy", "lexical"),
+            negations=aggregate("negations", "lexical"),
+            causal_verbs=aggregate("causal_verbs", "lexical"),
+            intentional_actions=aggregate("intentional_actions", "lexical"),
+
             word_count=aggregate("word_count", "surface"),
             sentence_length=aggregate("sentence_length", "surface"),
             function_to_content_ratio=aggregate("function_to_content_ratio", "surface"),
@@ -107,11 +134,12 @@ class FeatureProfiler:
             logical_connectives=aggregate("logical_connectives", "surface"),
             additive_connectives=aggregate("additive_connectives", "surface"),
             adversative_connectives=aggregate("adversative_connectives", "surface"),
+
             dependency_depth=aggregate("dependency_depth", "syntax"),
             modifiers_per_np=aggregate("modifiers_per_np", "syntax"),
             words_before_main_verb=aggregate("words_before_main_verb", "syntax"),
             passive_constructions=aggregate("passive_constructions", "syntax"),
-            syntactic_similarity_prev=None,  # not used
+
             content_overlap_adjacent=aggregate("content_overlap_adjacent", "cohesion"),
             content_overlap_all=aggregate("content_overlap_all", "cohesion"),
             noun_overlap_adjacent=aggregate("noun_overlap_adjacent", "cohesion"),
@@ -120,17 +148,24 @@ class FeatureProfiler:
             lsa_overlap_adjacent=aggregate("lsa_overlap_adjacent", "cohesion"),
             lsa_overlap_all=aggregate("lsa_overlap_all", "cohesion"),
             lsa_given_new=aggregate("lsa_given_new", "cohesion"),
-            lsa_verb_overlap_adjacent=aggregate("lsa_verb_overlap_adjacent", "cohesion"),
+            lsa_overlap_mean=aggregate("lsa_overlap_mean", "cohesion"),
+            lsa_overlap_std=aggregate("lsa_overlap_std", "cohesion"),
+            lsa_overlap_max=aggregate("lsa_overlap_max", "cohesion"),
+            lsa_overlap_min=aggregate("lsa_overlap_min", "cohesion"),
+            lsa_novelty=aggregate("lsa_novelty", "cohesion"),
+            lsa_shift=aggregate("lsa_shift", "cohesion"),
+            # lsa_verb_overlap_adjacent=aggregate("lsa_verb_overlap_adjacent", "cohesion"),
             pos_dissimilarity_prev=aggregate("pos_dissimilarity_prev", "cohesion"),
             word_dissimilarity_prev=aggregate("word_dissimilarity_prev", "cohesion"),
-            causal_cohesion=aggregate("causal_cohesion", "cohesion"),
-            intentional_cohesion=aggregate("intentional_cohesion", "cohesion"),
-            temporal_cohesion=aggregate("temporal_cohesion", "cohesion"),
+            new_word_ratio=aggregate("new_word_ratio", "cohesion"),
             verb_overlap_adjacent=aggregate("verb_overlap_adjacent", "cohesion"),
-            verb_tense_repetition=aggregate("verb_tense_repetition", "cohesion"),
-            verb_aspect_repetition=aggregate("verb_aspect_repetition", "cohesion"),
+            embedding_norm=aggregate("embedding_norm", "cohesion"),
+            embedding_norm_diff=aggregate("embedding_norm_diff", "cohesion"),
+            # verb_tense_repetition=aggregate("verb_tense_repetition", "cohesion"),
+            # verb_aspect_repetition=aggregate("verb_aspect_repetition", "cohesion"),
             type_token_ratio=aggregate("type_token_ratio", "cohesion"),
             lexical_diversity_all=aggregate("lexical_diversity_all", "cohesion"),
-            lexical_diversity_verbs=aggregate("lexical_diversity_verbs", "cohesion")
+            lexical_diversity_verbs=aggregate("lexical_diversity_verbs", "cohesion"),
+            sentence_length_cohesion=aggregate("sentence_length", "cohesion"),
+            sentence_length_log=aggregate("sentence_length_log", "cohesion"),
         )
-        return doc_profile
